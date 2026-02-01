@@ -40,6 +40,7 @@ public partial class MainViewModel : ObservableObject
         _logger = logger;
         ContextMenuItems.CollectionChanged += (_, _) => ApplyFilters();
         ApplyFilters();
+        OnSelectedPageChanged(SelectedPage);
     }
 
     [ObservableProperty]
@@ -75,6 +76,30 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private bool _showStatusMessage;
 
+    [ObservableProperty]
+    private AppPage _selectedPage = AppPage.Main;
+
+    [ObservableProperty]
+    private bool _isMainPage = true;
+
+    [ObservableProperty]
+    private bool _isDonatePage;
+
+    [ObservableProperty]
+    private string _authorName = "TOKYO";
+
+    [ObservableProperty]
+    private string _donateTitle = "Поддержать автора";
+
+    [ObservableProperty]
+    private string _donateMessage = "Спасибо, что выбрали эту программу. Ваша поддержка помогает развивать проект.";
+
+    [ObservableProperty]
+    private string _donateFooter = "С уважением,";
+
+    [ObservableProperty]
+    private string _donateLink = "https://dalink.to/tokyo_dev";
+
     /// <summary>
     /// Loads initial data for the main view.
     /// </summary>
@@ -95,6 +120,11 @@ public partial class MainViewModel : ObservableObject
         ApplyFilters();
     }
 
+    partial void OnSelectedPageChanged(AppPage value)
+    {
+        IsMainPage = value == AppPage.Main;
+        IsDonatePage = value == AppPage.Donate;
+    }
     partial void OnSelectedItemChanged(ContextMenuItem? value)
     {
         if (value == null)

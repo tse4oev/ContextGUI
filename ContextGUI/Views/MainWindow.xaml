@@ -28,10 +28,18 @@
 
                 <ui:TitleBar Grid.Row="0" Title="" Foreground="{DynamicResource AppTextPrimary}">
                     <ui:TitleBar.Header>
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
-                            <Ellipse Width="8" Height="8" Fill="{DynamicResource AppAccent}" Margin="0,0,10,0" />
-                            <TextBlock Text="ContextGUI" FontWeight="SemiBold" FontSize="13" />
-                        </StackPanel>
+                        <Grid Margin="8,0,0,0">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
+                                        Visibility="{Binding IsMainPage, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <Ellipse Width="8" Height="8" Fill="{DynamicResource AppAccent}" Margin="0,0,10,0" />
+                                <TextBlock Text="ContextGUI" FontWeight="SemiBold" FontSize="13" />
+                            </StackPanel>
+                            <StackPanel VerticalAlignment="Center"
+                                        Visibility="{Binding IsDonatePage, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <TextBlock Text="Поддержать автора" FontWeight="SemiBold" FontSize="14" />
+                                <TextBlock Text="Спасибо за поддержку проекта" Style="{StaticResource SectionSubtitleStyle}" />
+                            </StackPanel>
+                        </Grid>
                     </ui:TitleBar.Header>
                 </ui:TitleBar>
 
@@ -44,35 +52,52 @@
 
                     <Border Grid.Column="0" Style="{StaticResource CardContainerStyle}" Margin="0,0,16,0">
                         <StackPanel>
-                            <TextBlock Text="Разделы" Style="{StaticResource SectionTitleStyle}" />
-                            <TextBlock Text="Фильтры" Style="{StaticResource SectionSubtitleStyle}" Margin="0,0,0,10" />
+                            <TextBlock Text="Страницы" Style="{StaticResource SectionTitleStyle}" />
+                            <TextBlock Text="Навигация" Style="{StaticResource SectionSubtitleStyle}" Margin="0,0,0,10" />
 
-                            <StackPanel>
+                            <StackPanel Margin="0,0,0,18">
                                 <RadioButton Style="{StaticResource NavItemStyle}"
-                                             Content="Все элементы"
-                                             GroupName="Nav"
-                                             IsChecked="{Binding SelectedCategory, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=All}" />
+                                             Content="Управление"
+                                             GroupName="Pages"
+                                             IsChecked="{Binding SelectedPage, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=Main}" />
                                 <RadioButton Style="{StaticResource NavItemStyle}"
-                                             Content="Файлы"
-                                             GroupName="Nav"
-                                             IsChecked="{Binding SelectedCategory, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=Files}" />
-                                <RadioButton Style="{StaticResource NavItemStyle}"
-                                             Content="Папки"
-                                             GroupName="Nav"
-                                             IsChecked="{Binding SelectedCategory, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=Folders}" />
-                                <RadioButton Style="{StaticResource NavItemStyle}"
-                                             Content="Фон папки"
-                                             GroupName="Nav"
-                                             IsChecked="{Binding SelectedCategory, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=FolderBackground}" />
-                                <RadioButton Style="{StaticResource NavItemStyle}"
-                                             Content="Диски"
-                                             GroupName="Nav"
-                                             IsChecked="{Binding SelectedCategory, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=Drives}" />
+                                             Content="Донат"
+                                             GroupName="Pages"
+                                             IsChecked="{Binding SelectedPage, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=Donate}" />
+                            </StackPanel>
+
+                            <StackPanel Visibility="{Binding IsMainPage, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <TextBlock Text="Разделы" Style="{StaticResource SectionTitleStyle}" Margin="0,6,0,0" />
+                                <TextBlock Text="Фильтры" Style="{StaticResource SectionSubtitleStyle}" Margin="0,0,0,10" />
+
+                                <StackPanel>
+                                    <RadioButton Style="{StaticResource NavItemStyle}"
+                                                 Content="Все элементы"
+                                                 GroupName="Nav"
+                                                 IsChecked="{Binding SelectedCategory, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=All}" />
+                                    <RadioButton Style="{StaticResource NavItemStyle}"
+                                                 Content="Файлы"
+                                                 GroupName="Nav"
+                                                 IsChecked="{Binding SelectedCategory, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=Files}" />
+                                    <RadioButton Style="{StaticResource NavItemStyle}"
+                                                 Content="Папки"
+                                                 GroupName="Nav"
+                                                 IsChecked="{Binding SelectedCategory, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=Folders}" />
+                                    <RadioButton Style="{StaticResource NavItemStyle}"
+                                                 Content="Фон папки"
+                                                 GroupName="Nav"
+                                                 IsChecked="{Binding SelectedCategory, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=FolderBackground}" />
+                                    <RadioButton Style="{StaticResource NavItemStyle}"
+                                                 Content="Диски"
+                                                 GroupName="Nav"
+                                                 IsChecked="{Binding SelectedCategory, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=Drives}" />
+                                </StackPanel>
                             </StackPanel>
                         </StackPanel>
                     </Border>
 
-                    <Border Grid.Column="1" Style="{StaticResource CardContainerStyle}" Margin="0,0,16,0">
+                    <Border Grid.Column="1" Style="{StaticResource CardContainerStyle}" Margin="0,0,16,0"
+                            Visibility="{Binding IsMainPage, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
@@ -144,7 +169,8 @@
                         </Grid>
                     </Border>
 
-                    <Border Grid.Column="2" Style="{StaticResource CardContainerStyle}">
+                    <Border Grid.Column="2" Style="{StaticResource CardContainerStyle}"
+                            Visibility="{Binding IsMainPage, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                             <StackPanel>
                             <TextBlock Text="Детали" Style="{StaticResource SectionTitleStyle}" />
@@ -222,6 +248,37 @@
                             </Border>
                             </StackPanel>
                         </ScrollViewer>
+                    </Border>
+
+                    <Border Grid.Column="1" Grid.ColumnSpan="2" Style="{StaticResource CardContainerStyle}"
+                            Visibility="{Binding IsDonatePage, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <StackPanel>
+                            <TextBlock Text="Спасибо за поддержку" Style="{StaticResource SectionTitleStyle}" />
+                            <TextBlock Text="{Binding DonateMessage}"
+                                       Style="{StaticResource SectionSubtitleStyle}"
+                                       TextWrapping="Wrap"
+                                       Margin="0,0,0,16" />
+
+                            <Border Background="{DynamicResource AppSurfaceAlt}"
+                                    BorderBrush="{DynamicResource AppCardBorder}"
+                                    BorderThickness="1"
+                                    CornerRadius="12"
+                                    Padding="16"
+                                    Margin="0,0,0,16">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding DonateTitle}" FontWeight="SemiBold" Margin="0,0,0,8" />
+                                    <TextBlock Text="Ссылка для доната" Style="{StaticResource SectionSubtitleStyle}" />
+                                    <TextBlock Margin="0,6,0,0">
+                                        <Hyperlink NavigateUri="{Binding DonateLink}" RequestNavigate="OnDonateLinkNavigate">
+                                            <Run Text="{Binding DonateLink}" />
+                                        </Hyperlink>
+                                    </TextBlock>
+                                </StackPanel>
+                            </Border>
+
+                            <TextBlock Text="{Binding DonateFooter}" Style="{StaticResource SectionSubtitleStyle}" />
+                            <TextBlock Text="{Binding AuthorName}" FontWeight="SemiBold" FontSize="14" />
+                        </StackPanel>
                     </Border>
 
                     <ContentPresenter x:Name="RootContentDialogPresenter"

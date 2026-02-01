@@ -1,5 +1,6 @@
 using System;
 using System.Windows;
+using System.Windows.Navigation;
 using ContextGUI.Core.ViewModels;
 using ContextGUI.Services.Interfaces;
 using Wpf.Ui;
@@ -69,6 +70,23 @@ public partial class MainWindow : FluentWindow
         };
 
         await _contentDialogService.ShowAsync(dialog, System.Threading.CancellationToken.None);
+    }
+
+    private void OnDonateLinkNavigate(object sender, RequestNavigateEventArgs e)
+    {
+        try
+        {
+            var info = new System.Diagnostics.ProcessStartInfo(e.Uri.AbsoluteUri)
+            {
+                UseShellExecute = true
+            };
+            System.Diagnostics.Process.Start(info);
+        }
+        catch
+        {
+        }
+
+        e.Handled = true;
     }
 
 }
