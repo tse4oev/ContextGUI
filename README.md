@@ -1,5 +1,9 @@
 # ContextGUI
 
+![Release](https://img.shields.io/github/v/release/tse4oev/ContextGUI?display_name=tag&label=release)
+![Build](https://github.com/tse4oev/ContextGUI/actions/workflows/release.yml/badge.svg)
+![License](https://img.shields.io/github/license/tse4oev/ContextGUI)
+
 **Windows 11 Context Menu Manager** - мощный инструмент для управления контекстным меню Windows 11.
 
 ## 🎯 Возможности
@@ -23,6 +27,11 @@
 - Serilog для логирования
 - xUnit + FluentAssertions для тестирования
 
+## 📥 Скачать
+
+Стабильные релизы и готовый EXE:
+- https://github.com/tse4oev/ContextGUI/releases
+
 ## 📋 Требования
 
 - Windows 11
@@ -40,6 +49,13 @@ dotnet run --project ContextGUI
 ```
 
 ⚠️ **Важно:** Запускайте только с правами администратора!
+
+## 🖼 Скриншоты
+
+> Добавьте изображения в `docs/screenshots/` и обновите ссылки ниже.
+
+- `docs/screenshots/main.png`
+- `docs/screenshots/donate.png`
 
 ## 🔄 Обновления
 

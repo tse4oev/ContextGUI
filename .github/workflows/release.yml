@@ -1,0 +1,57 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Publish (self-contained, single file)
+        run: >
+          dotnet publish ContextGUI/ContextGUI.csproj
+          -c Release
+          -r win-x64
+          --self-contained true
+          /p:PublishSingleFile=true
+          /p:IncludeNativeLibrariesForSelfExtract=true
+          /p:PublishDir=${{ github.workspace }}\publish\ContextGUI-${{ github.ref_name }}\
+
+      - name: Decode signing certificate (optional)
+        if: ${{ secrets.SIGNING_PFX != '' }}
+        run: |
+          $pfxPath = "${{ github.workspace }}\signing.pfx"
+          $bytes = [Convert]::FromBase64String("${{ secrets.SIGNING_PFX }}")
+          [System.IO.File]::WriteAllBytes($pfxPath, $bytes)
+
+      - name: Sign EXE (optional)
+        if: ${{ secrets.SIGNING_PFX != '' && secrets.SIGNING_PASSWORD != '' }}
+        run: |
+          $signtool = "${env:ProgramFiles(x86)}\Windows Kits\10\bin\x64\signtool.exe"
+          if (Test-Path $signtool) {
+            & $signtool sign /f "${{ github.workspace }}\signing.pfx" /p "${{ secrets.SIGNING_PASSWORD }}" /tr http://timestamp.digicert.com /td sha256 /fd sha256 "${{ github.workspace }}\publish\ContextGUI-${{ github.ref_name }}\ContextGUI.exe"
+          }
+
+      - name: Upload release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            ${{ github.workspace }}\publish\ContextGUI-${{ github.ref_name }}\ContextGUI.exe

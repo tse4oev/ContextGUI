@@ -530,7 +530,7 @@ public partial class MainViewModel : ObservableObject
 
         if (string.IsNullOrWhiteSpace(_settings.Update.RepositoryOwner))
         {
-            _settings.Update.RepositoryOwner = "TOKYO";
+            _settings.Update.RepositoryOwner = "tse4oev";
         }
 
         if (string.IsNullOrWhiteSpace(_settings.Update.RepositoryName))
