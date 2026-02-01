@@ -52,10 +52,8 @@ dotnet run --project ContextGUI
 
 ## 🖼 Скриншоты
 
-> Добавьте изображения в `docs/screenshots/` и обновите ссылки ниже.
-
-- `docs/screenshots/main.png`
-- `docs/screenshots/donate.png`
+![Главный экран](docs/screenshots/main.png)
+![Страница доната](docs/screenshots/donate.png)
 
 ## 🔄 Обновления
 
