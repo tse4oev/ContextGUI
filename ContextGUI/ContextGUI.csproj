@@ -28,8 +28,4 @@
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Resource Include="Assets\qr-tokyo.png" />
-  </ItemGroup>
-
 </Project>

@@ -15,46 +15,31 @@ public partial class MainViewModel : ObservableObject
 {
     private readonly IRegistryService _registryService;
     private readonly IItemEditDialogService _itemEditDialogService;
-    private readonly IBackupHistoryService _backupHistoryService;
     private readonly IShellRefreshService _shellRefreshService;
     private readonly IAdminService _adminService;
-    private readonly ISettingsService _settingsService;
-    private readonly IUpdateService _updateService;
-    private readonly IUpdateDialogService _updateDialogService;
     private readonly ILoggingService _logger;
-    private AppSettings _settings = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MainViewModel"/> class.
     /// </summary>
     /// <param name="registryService">Registry service.</param>
     /// <param name="itemEditDialogService">Item edit dialog service.</param>
-    /// <param name="backupHistoryService">Backup history service.</param>
     /// <param name="shellRefreshService">Shell refresh service.</param>
     /// <param name="logger">Logging service.</param>
     public MainViewModel(
         IRegistryService registryService,
         IItemEditDialogService itemEditDialogService,
-        IBackupHistoryService backupHistoryService,
         IShellRefreshService shellRefreshService,
         IAdminService adminService,
-        ISettingsService settingsService,
-        IUpdateService updateService,
-        IUpdateDialogService updateDialogService,
         ILoggingService logger)
     {
         _registryService = registryService;
         _itemEditDialogService = itemEditDialogService;
-        _backupHistoryService = backupHistoryService;
         _shellRefreshService = shellRefreshService;
         _adminService = adminService;
-        _settingsService = settingsService;
-        _updateService = updateService;
-        _updateDialogService = updateDialogService;
         _logger = logger;
         ContextMenuItems.CollectionChanged += (_, _) => ApplyFilters();
         ApplyFilters();
-        OnSelectedPageChanged(SelectedPage);
     }
 
     [ObservableProperty]
@@ -90,69 +75,10 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private bool _showStatusMessage;
 
-    [ObservableProperty]
-    private ObservableCollection<BackupEntry> _backups = new();
-
-    [ObservableProperty]
-    private ObservableCollection<string> _recentEvents = new();
-
-    [ObservableProperty]
-    private AppPage _selectedPage = AppPage.Main;
-
-    [ObservableProperty]
-    private bool _isMainPage = true;
-
-    [ObservableProperty]
-    private bool _isDonatePage;
-
-    [ObservableProperty]
-    private string _authorName = "TOKYO";
-
-    [ObservableProperty]
-    private string _donateTitle = "Поддержать автора";
-
-    [ObservableProperty]
-    private string _donateMessage = "Спасибо, что выбрали эту программу. Ваша поддержка помогает развивать проект.";
-
-    [ObservableProperty]
-    private string _donateFooter = "С уважением,";
-
-    [ObservableProperty]
-    private string _donateLink = "https://dalink.to/tokyo_dev";
-
-    [ObservableProperty]
-    private bool _autoCheckUpdates = true;
-
-    [ObservableProperty]
-    private string _updateStatusMessage = string.Empty;
-
-    [ObservableProperty]
-    private bool _showUpdateStatus;
-
-    [ObservableProperty]
-    private string _repositoryOwner = string.Empty;
-
-    [ObservableProperty]
-    private string _repositoryName = string.Empty;
-
-    partial void OnBackupsChanged(ObservableCollection<BackupEntry> value)
-    {
-        RestoreLatestBackupCommand.NotifyCanExecuteChanged();
-    }
-
     /// <summary>
     /// Loads initial data for the main view.
     /// </summary>
-    public async Task InitializeAsync()
-    {
-        await LoadSettingsAsync();
-        await LoadContextMenuItemsAsync();
-
-        if (AutoCheckUpdates)
-        {
-            await CheckUpdatesAsync(silent: true);
-        }
-    }
+    public Task InitializeAsync() => LoadContextMenuItemsAsync();
 
     partial void OnSearchQueryChanged(string value)
     {
@@ -167,30 +93,6 @@ public partial class MainViewModel : ObservableObject
     partial void OnSelectedCategoryChanged(ContextMenuCategory value)
     {
         ApplyFilters();
-    }
-
-    partial void OnSelectedPageChanged(AppPage value)
-    {
-        IsMainPage = value == AppPage.Main;
-        IsDonatePage = value == AppPage.Donate;
-    }
-
-    partial void OnAutoCheckUpdatesChanged(bool value)
-    {
-        _settings.Update.AutoCheckUpdates = value;
-        _ = SaveSettingsAsync();
-    }
-
-    partial void OnRepositoryOwnerChanged(string value)
-    {
-        _settings.Update.RepositoryOwner = value?.Trim();
-        _ = SaveSettingsAsync();
-    }
-
-    partial void OnRepositoryNameChanged(string value)
-    {
-        _settings.Update.RepositoryName = value?.Trim();
-        _ = SaveSettingsAsync();
     }
 
     partial void OnSelectedItemChanged(ContextMenuItem? value)
@@ -248,7 +150,6 @@ public partial class MainViewModel : ObservableObject
             }
 
             ApplyFilters();
-            await LoadBackupsAsync();
         }
         catch (System.Exception ex)
         {
@@ -264,32 +165,6 @@ public partial class MainViewModel : ObservableObject
         {
             SetStatus("Список обновлен.");
         }
-    }
-
-    [RelayCommand]
-    private async Task LoadBackupsAsync()
-    {
-        try
-        {
-            var items = await _backupHistoryService.GetBackupsAsync();
-            Backups.Clear();
-            foreach (var item in items)
-            {
-                Backups.Add(item);
-            }
-
-            RestoreLatestBackupCommand.NotifyCanExecuteChanged();
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex, "Failed to load backups");
-        }
-    }
-
-    [RelayCommand]
-    private async Task CheckUpdatesAsync()
-    {
-        await CheckUpdatesAsync(silent: false);
     }
 
     private bool CanDeleteSelected() => SelectedItem is { IsSystemItem: false };
@@ -436,63 +311,10 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    [RelayCommand(CanExecute = nameof(CanRestoreBackup))]
-    private async Task RestoreLatestBackupAsync()
-    {
-        var result = await _backupHistoryService.RestoreLatestBackupAsync();
-        if (result.Success)
-        {
-            NotifyShellChange();
-            await LoadContextMenuItemsAsync();
-        }
-        else
-        {
-            SetStatus(result.Error ?? "Не удалось восстановить backup.");
-        }
-    }
-
-    [RelayCommand(CanExecute = nameof(CanRestoreSelectedBackup))]
-    private async Task RestoreSelectedBackupAsync(BackupEntry? backup)
-    {
-        if (backup == null)
-        {
-            return;
-        }
-
-        var result = await _backupHistoryService.RestoreBackupAsync(backup.FilePath);
-        if (result.Success)
-        {
-            NotifyShellChange();
-            await LoadContextMenuItemsAsync();
-        }
-        else
-        {
-            SetStatus(result.Error ?? "Не удалось восстановить backup.");
-        }
-    }
-
-    private bool CanRestoreBackup() => Backups.Count > 0;
-
-    private bool CanRestoreSelectedBackup(BackupEntry? backup) => backup != null;
-
     private void SetStatus(string message)
     {
         StatusMessage = message;
         ShowStatusMessage = !string.IsNullOrWhiteSpace(message);
-        if (!string.IsNullOrWhiteSpace(message))
-        {
-            AddEvent(message);
-        }
-    }
-
-    private void AddEvent(string message)
-    {
-        var stamp = System.DateTime.Now.ToString("HH:mm");
-        RecentEvents.Insert(0, $"{stamp} — {message}");
-        while (RecentEvents.Count > 10)
-        {
-            RecentEvents.RemoveAt(RecentEvents.Count - 1);
-        }
     }
 
     [RelayCommand(CanExecute = nameof(CanEditSelected))]
@@ -541,120 +363,4 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    private async Task LoadSettingsAsync()
-    {
-        _settings = await _settingsService.LoadAsync();
-        AutoCheckUpdates = _settings.Update.AutoCheckUpdates;
-        RepositoryOwner = _settings.Update.RepositoryOwner ?? string.Empty;
-        RepositoryName = _settings.Update.RepositoryName ?? string.Empty;
-
-        if (string.IsNullOrWhiteSpace(_settings.Update.RepositoryOwner))
-        {
-            _settings.Update.RepositoryOwner = "tse4oev";
-        }
-
-        if (string.IsNullOrWhiteSpace(_settings.Update.RepositoryName))
-        {
-            _settings.Update.RepositoryName = "ContextGUI";
-        }
-
-        RepositoryOwner = _settings.Update.RepositoryOwner;
-        RepositoryName = _settings.Update.RepositoryName;
-
-        await SaveSettingsAsync();
-    }
-
-    private async Task SaveSettingsAsync()
-    {
-        try
-        {
-            await _settingsService.SaveAsync(_settings);
-        }
-        catch (System.Exception ex)
-        {
-            _logger.LogError(ex, "Failed to save settings");
-        }
-    }
-
-    private async Task CheckUpdatesAsync(bool silent)
-    {
-        var settings = _settings.Update;
-        var currentVersion = _updateService.GetCurrentVersion();
-
-        var result = await _updateService.CheckForUpdateAsync(settings);
-        if (!result.Success || result.Value == null)
-        {
-            if (!silent)
-            {
-                SetUpdateStatus(result.Error ?? "Не удалось проверить обновления.");
-            }
-
-            return;
-        }
-
-        var latest = result.Value;
-        if (latest.Version <= currentVersion)
-        {
-            if (!silent)
-            {
-                SetUpdateStatus("У вас установлена последняя версия.");
-            }
-
-            return;
-        }
-
-        if (!string.IsNullOrWhiteSpace(settings.SkipVersion) &&
-            string.Equals(settings.SkipVersion, latest.Version.ToString(), System.StringComparison.OrdinalIgnoreCase))
-        {
-            if (!silent)
-            {
-                SetUpdateStatus("Эта версия обновления скрыта.");
-            }
-
-            return;
-        }
-
-        var dialogResult = await _updateDialogService.ShowUpdateDialogAsync(latest, currentVersion);
-        if (dialogResult == UpdateDialogResult.SkipVersion)
-        {
-            settings.SkipVersion = latest.Version.ToString();
-            await SaveSettingsAsync();
-            SetUpdateStatus("Версия обновления скрыта.");
-            return;
-        }
-
-        if (dialogResult == UpdateDialogResult.OpenRelease && !string.IsNullOrWhiteSpace(latest.ReleaseUrl))
-        {
-            OpenUrl(latest.ReleaseUrl);
-            SetUpdateStatus("Открыта страница релиза.");
-            return;
-        }
-
-        if (!silent)
-        {
-            SetUpdateStatus("Обновление доступно.");
-        }
-    }
-
-    private void SetUpdateStatus(string message)
-    {
-        UpdateStatusMessage = message;
-        ShowUpdateStatus = !string.IsNullOrWhiteSpace(message);
-    }
-
-    private static void OpenUrl(string url)
-    {
-        try
-        {
-            var info = new System.Diagnostics.ProcessStartInfo(url)
-            {
-                UseShellExecute = true
-            };
-
-            System.Diagnostics.Process.Start(info);
-        }
-        catch
-        {
-        }
-    }
 }

@@ -40,16 +40,12 @@ public partial class App : Application
 
         services.AddSingleton<IAdminService, AdminService>();
         services.AddSingleton<IBackupService, BackupService>();
-        services.AddSingleton<IBackupHistoryService, BackupHistoryService>();
         services.AddSingleton<ILoggingService, LoggingService>();
         services.AddSingleton<IRegistryWrapper, RegistryWrapper>();
         services.AddSingleton<IRegistryService, RegistryService>();
         services.AddSingleton<IShellRefreshService, ShellRefreshService>();
-        services.AddSingleton<ISettingsService, SettingsService>();
-        services.AddSingleton<IUpdateService, GitHubUpdateService>();
         services.AddSingleton<IContentDialogService, ContentDialogService>();
         services.AddSingleton<IItemEditDialogService, ItemEditDialogService>();
-        services.AddSingleton<IUpdateDialogService, UpdateDialogService>();
 
         services.AddTransient<MainViewModel>();
         services.AddTransient<Views.MainWindow>();

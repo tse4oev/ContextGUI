@@ -1,6 +1,5 @@
 using System;
 using System.Windows;
-using System.Windows.Navigation;
 using ContextGUI.Core.ViewModels;
 using ContextGUI.Services.Interfaces;
 using Wpf.Ui;
@@ -36,6 +35,7 @@ public partial class MainWindow : FluentWindow
         MaxWidth = 1120;
         MaxHeight = 680;
         Loaded += OnLoaded;
+        SizeChanged += OnSizeChanged;
     }
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
@@ -46,6 +46,15 @@ public partial class MainWindow : FluentWindow
         }
 
         await _viewModel.InitializeAsync();
+    }
+
+    private void OnSizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (Width != 1120 || Height != 680)
+        {
+            Width = 1120;
+            Height = 680;
+        }
     }
 
     private async System.Threading.Tasks.Task ShowAdminRequiredAsync()
@@ -59,23 +68,7 @@ public partial class MainWindow : FluentWindow
             DialogWidth = 460
         };
 
-        await _contentDialogService.ShowAsync(dialog);
+        await _contentDialogService.ShowAsync(dialog, System.Threading.CancellationToken.None);
     }
 
-    private void OnDonateLinkNavigate(object sender, RequestNavigateEventArgs e)
-    {
-        try
-        {
-            var info = new System.Diagnostics.ProcessStartInfo(e.Uri.AbsoluteUri)
-            {
-                UseShellExecute = true
-            };
-            System.Diagnostics.Process.Start(info);
-        }
-        catch
-        {
-        }
-
-        e.Handled = true;
-    }
 }

@@ -28,18 +28,10 @@
 
                 <ui:TitleBar Grid.Row="0" Title="" Foreground="{DynamicResource AppTextPrimary}">
                     <ui:TitleBar.Header>
-                        <Grid Margin="8,0,0,0">
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
-                                        Visibility="{Binding IsMainPage, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                <Ellipse Width="8" Height="8" Fill="{DynamicResource AppAccent}" Margin="0,0,10,0" />
-                                <TextBlock Text="ContextGUI" FontWeight="SemiBold" FontSize="13" />
-                            </StackPanel>
-                            <StackPanel VerticalAlignment="Center"
-                                        Visibility="{Binding IsDonatePage, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                <TextBlock Text="Поддержать автора" FontWeight="SemiBold" FontSize="14" />
-                                <TextBlock Text="Спасибо за поддержку проекта" Style="{StaticResource SectionSubtitleStyle}" />
-                            </StackPanel>
-                        </Grid>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
+                            <Ellipse Width="8" Height="8" Fill="{DynamicResource AppAccent}" Margin="0,0,10,0" />
+                            <TextBlock Text="ContextGUI" FontWeight="SemiBold" FontSize="13" />
+                        </StackPanel>
                     </ui:TitleBar.Header>
                 </ui:TitleBar>
 
@@ -52,52 +44,35 @@
 
                     <Border Grid.Column="0" Style="{StaticResource CardContainerStyle}" Margin="0,0,16,0">
                         <StackPanel>
-                            <TextBlock Text="Страницы" Style="{StaticResource SectionTitleStyle}" />
-                            <TextBlock Text="Навигация" Style="{StaticResource SectionSubtitleStyle}" Margin="0,0,0,10" />
+                            <TextBlock Text="Разделы" Style="{StaticResource SectionTitleStyle}" />
+                            <TextBlock Text="Фильтры" Style="{StaticResource SectionSubtitleStyle}" Margin="0,0,0,10" />
 
-                            <StackPanel Margin="0,0,0,18">
+                            <StackPanel>
                                 <RadioButton Style="{StaticResource NavItemStyle}"
-                                             Content="Управление"
-                                             GroupName="Pages"
-                                             IsChecked="{Binding SelectedPage, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=Main}" />
+                                             Content="Все элементы"
+                                             GroupName="Nav"
+                                             IsChecked="{Binding SelectedCategory, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=All}" />
                                 <RadioButton Style="{StaticResource NavItemStyle}"
-                                             Content="Донат"
-                                             GroupName="Pages"
-                                             IsChecked="{Binding SelectedPage, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=Donate}" />
-                            </StackPanel>
-
-                            <StackPanel Visibility="{Binding IsMainPage, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                <TextBlock Text="Разделы" Style="{StaticResource SectionTitleStyle}" Margin="0,6,0,0" />
-                                <TextBlock Text="Фильтры" Style="{StaticResource SectionSubtitleStyle}" Margin="0,0,0,10" />
-
-                                <StackPanel>
-                                    <RadioButton Style="{StaticResource NavItemStyle}"
-                                                 Content="Все элементы"
-                                                 GroupName="Nav"
-                                                 IsChecked="{Binding SelectedCategory, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=All}" />
-                                    <RadioButton Style="{StaticResource NavItemStyle}"
-                                                 Content="Файлы"
-                                                 GroupName="Nav"
-                                                 IsChecked="{Binding SelectedCategory, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=Files}" />
-                                    <RadioButton Style="{StaticResource NavItemStyle}"
-                                                 Content="Папки"
-                                                 GroupName="Nav"
-                                                 IsChecked="{Binding SelectedCategory, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=Folders}" />
-                                    <RadioButton Style="{StaticResource NavItemStyle}"
-                                                 Content="Фон папки"
-                                                 GroupName="Nav"
-                                                 IsChecked="{Binding SelectedCategory, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=FolderBackground}" />
-                                    <RadioButton Style="{StaticResource NavItemStyle}"
-                                                 Content="Диски"
-                                                 GroupName="Nav"
-                                                 IsChecked="{Binding SelectedCategory, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=Drives}" />
-                                </StackPanel>
+                                             Content="Файлы"
+                                             GroupName="Nav"
+                                             IsChecked="{Binding SelectedCategory, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=Files}" />
+                                <RadioButton Style="{StaticResource NavItemStyle}"
+                                             Content="Папки"
+                                             GroupName="Nav"
+                                             IsChecked="{Binding SelectedCategory, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=Folders}" />
+                                <RadioButton Style="{StaticResource NavItemStyle}"
+                                             Content="Фон папки"
+                                             GroupName="Nav"
+                                             IsChecked="{Binding SelectedCategory, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=FolderBackground}" />
+                                <RadioButton Style="{StaticResource NavItemStyle}"
+                                             Content="Диски"
+                                             GroupName="Nav"
+                                             IsChecked="{Binding SelectedCategory, Converter={StaticResource EnumEqualsConverter}, ConverterParameter=Drives}" />
                             </StackPanel>
                         </StackPanel>
                     </Border>
 
-                    <Border Grid.Column="1" Style="{StaticResource CardContainerStyle}" Margin="0,0,16,0"
-                            Visibility="{Binding IsMainPage, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <Border Grid.Column="1" Style="{StaticResource CardContainerStyle}" Margin="0,0,16,0">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
@@ -113,9 +88,13 @@
                                               IsChecked="{Binding ShowOnlyEnabled}"
                                               Foreground="{DynamicResource AppTextSecondary}" />
                                     <Button Style="{StaticResource ActionButtonStyle}"
-                                            Content="Обновить"
                                             Command="{Binding RefreshCommand}"
-                                            Margin="12,0,0,0" />
+                                            Margin="12,0,0,0">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Path Style="{StaticResource LucideIconStyle}" Data="{StaticResource LucideRefreshCwGeometry}" />
+                                            <TextBlock Text="Обновить" Margin="8,0,0,0" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </Button>
                                 </StackPanel>
 
                                 <Border Background="{DynamicResource AppSurfaceAlt}"
@@ -129,7 +108,12 @@
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
-                                        <ui:SymbolIcon Symbol="Search24" Foreground="{DynamicResource AppTextSecondary}" Width="18" Height="18" VerticalAlignment="Center" />
+                                        <Path Style="{StaticResource LucideIconStyle}"
+                                              Data="{StaticResource LucideSearchGeometry}"
+                                              Stroke="{DynamicResource AppTextSecondary}"
+                                              Width="18"
+                                              Height="18"
+                                              VerticalAlignment="Center" />
                                         <TextBox Grid.Column="1"
                                                  Style="{StaticResource SearchTextBoxStyle}"
                                                  Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" />
@@ -160,8 +144,7 @@
                         </Grid>
                     </Border>
 
-                    <Border Grid.Column="2" Style="{StaticResource CardContainerStyle}"
-                            Visibility="{Binding IsMainPage, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <Border Grid.Column="2" Style="{StaticResource CardContainerStyle}">
                         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                             <StackPanel>
                             <TextBlock Text="Детали" Style="{StaticResource SectionTitleStyle}" />
@@ -199,52 +182,33 @@
                                 <UniformGrid Columns="2" Rows="2">
                                     <Button Style="{StaticResource ActionButtonStyle}"
                                             Margin="0,0,8,8"
-                                            Content="Включить"
-                                            Command="{Binding EnableItemCommand}" />
+                                            Command="{Binding EnableItemCommand}">
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <Path Style="{StaticResource LucideIconStyle}" Data="{StaticResource LucideCheckGeometry}" />
+                                            <TextBlock Text="Включить" Margin="8,0,0,0" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </Button>
                                     <Button Style="{StaticResource ActionButtonStyle}"
                                             Margin="0,0,0,8"
-                                            Content="Отключить"
-                                            Command="{Binding DisableItemCommand}" />
+                                            Command="{Binding DisableItemCommand}">
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <Path Style="{StaticResource LucideIconStyle}" Data="{StaticResource LucideXGeometry}" />
+                                            <TextBlock Text="Отключить" Margin="8,0,0,0" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </Button>
                                     <Button Style="{StaticResource DangerButtonStyle}"
                                             Margin="0,0,8,0"
-                                            Content="Удалить"
-                                            Command="{Binding DeleteItemCommand}" />
+                                            Command="{Binding DeleteItemCommand}">
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <Path Style="{StaticResource LucideIconStyle}" Data="{StaticResource LucideTrashGeometry}" Stroke="#FFB3BE" />
+                                            <TextBlock Text="Удалить" Margin="8,0,0,0" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </Button>
                                     <Button Style="{StaticResource ActionButtonStyle}"
                                             Margin="0,0,0,0"
                                             Content="Редактировать"
                                             Command="{Binding EditItemCommand}" />
                                 </UniformGrid>
-                            </StackPanel>
-
-                            <StackPanel Margin="0,18,0,0">
-                                <TextBlock Text="Backups" Style="{StaticResource SectionSubtitleStyle}" Margin="0,0,0,8" />
-                                <Button Style="{StaticResource ActionButtonStyle}"
-                                        Content="Откатить последнее"
-                                        Command="{Binding RestoreLatestBackupCommand}"
-                                        Margin="0,0,0,10" />
-
-                                <ListBox ItemsSource="{Binding Backups}" BorderThickness="0" Background="Transparent" MaxHeight="220">
-                                    <ListBox.ItemTemplate>
-                                        <DataTemplate>
-                                            <Border Background="{DynamicResource AppSurfaceAlt}"
-                                                    BorderBrush="{DynamicResource AppCardBorder}"
-                                                    BorderThickness="1"
-                                                    CornerRadius="10"
-                                                    Padding="10"
-                                                    Margin="0,0,0,8">
-                                                <StackPanel>
-                                                    <TextBlock Text="{Binding FileName}" FontWeight="SemiBold" />
-                                                    <TextBlock Text="{Binding CreatedAt}" Style="{StaticResource SectionSubtitleStyle}" />
-                                                    <Button Style="{StaticResource ActionButtonStyle}"
-                                                            Content="Восстановить"
-                                                            Command="{Binding DataContext.RestoreSelectedBackupCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
-                                                            CommandParameter="{Binding}"
-                                                            Margin="0,8,0,0" />
-                                                </StackPanel>
-                                            </Border>
-                                        </DataTemplate>
-                                    </ListBox.ItemTemplate>
-                                </ListBox>
                             </StackPanel>
 
                             <Border Margin="0,14,0,0"
@@ -256,112 +220,8 @@
                                     Visibility="{Binding ShowStatusMessage, Converter={StaticResource BooleanToVisibilityConverter}}">
                                 <TextBlock Text="{Binding StatusMessage}" Style="{StaticResource SectionSubtitleStyle}" TextWrapping="Wrap" />
                             </Border>
-
-                            <StackPanel Margin="0,16,0,0">
-                                <TextBlock Text="События" Style="{StaticResource SectionSubtitleStyle}" Margin="0,0,0,6" />
-                                <ListBox ItemsSource="{Binding RecentEvents}"
-                                         Background="Transparent"
-                                         BorderThickness="0"
-                                         MaxHeight="140">
-                                    <ListBox.ItemTemplate>
-                                        <DataTemplate>
-                                            <TextBlock Text="{Binding}" Style="{StaticResource SectionSubtitleStyle}" TextWrapping="Wrap" />
-                                        </DataTemplate>
-                                    </ListBox.ItemTemplate>
-                                </ListBox>
-                            </StackPanel>
-
-                            <StackPanel Margin="0,16,0,0">
-                                <TextBlock Text="Обновления" Style="{StaticResource SectionSubtitleStyle}" Margin="0,0,0,6" />
-                                <CheckBox Content="Проверять автоматически"
-                                          IsChecked="{Binding AutoCheckUpdates}"
-                                          Foreground="{DynamicResource AppTextSecondary}" />
-                                <TextBlock Text="Репозиторий GitHub" Style="{StaticResource SectionSubtitleStyle}" Margin="0,10,0,4" />
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBox Grid.Column="0"
-                                             Text="{Binding RepositoryOwner, UpdateSourceTrigger=PropertyChanged}"
-                                             Background="Transparent"
-                                             BorderThickness="1"
-                                             BorderBrush="{DynamicResource AppCardBorder}"
-                                             Foreground="{DynamicResource AppTextPrimary}"
-                                             Padding="8,6"
-                                             Margin="0,0,6,0" />
-                                    <TextBlock Grid.Column="1"
-                                               Text="/"
-                                               VerticalAlignment="Center"
-                                               Foreground="{DynamicResource AppTextSecondary}"
-                                               Margin="0,0,6,0" />
-                                    <TextBox Grid.Column="2"
-                                             Text="{Binding RepositoryName, UpdateSourceTrigger=PropertyChanged}"
-                                             Background="Transparent"
-                                             BorderThickness="1"
-                                             BorderBrush="{DynamicResource AppCardBorder}"
-                                             Foreground="{DynamicResource AppTextPrimary}"
-                                             Padding="8,6" />
-                                </Grid>
-                                <Button Style="{StaticResource ActionButtonStyle}"
-                                        Content="Проверить обновления"
-                                        Command="{Binding CheckUpdatesCommand}"
-                                        Margin="0,8,0,0" />
-                                <Border Margin="0,10,0,0"
-                                        Background="#151519"
-                                        BorderBrush="{DynamicResource AppCardBorder}"
-                                        BorderThickness="1"
-                                        CornerRadius="10"
-                                        Padding="10"
-                                        Visibility="{Binding ShowUpdateStatus, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                    <TextBlock Text="{Binding UpdateStatusMessage}" Style="{StaticResource SectionSubtitleStyle}" TextWrapping="Wrap" />
-                                </Border>
-                            </StackPanel>
                             </StackPanel>
                         </ScrollViewer>
-                    </Border>
-                    <Border Grid.Column="1" Grid.ColumnSpan="2" Style="{StaticResource CardContainerStyle}"
-                            Visibility="{Binding IsDonatePage, Converter={StaticResource BooleanToVisibilityConverter}}">
-                        <StackPanel>
-                            <TextBlock Text="Спасибо за поддержку" Style="{StaticResource SectionTitleStyle}" />
-                            <TextBlock Text="{Binding DonateMessage}"
-                                       Style="{StaticResource SectionSubtitleStyle}"
-                                       TextWrapping="Wrap"
-                                       Margin="0,0,0,16" />
-
-                            <Border Background="{DynamicResource AppSurfaceAlt}"
-                                    BorderBrush="{DynamicResource AppCardBorder}"
-                                    BorderThickness="1"
-                                    CornerRadius="12"
-                                    Padding="16"
-                                    Margin="0,0,0,16">
-                                <StackPanel>
-                                    <TextBlock Text="{Binding DonateTitle}" FontWeight="SemiBold" Margin="0,0,0,8" />
-                                    <TextBlock Text="Ссылка для доната" Style="{StaticResource SectionSubtitleStyle}" />
-                                    <TextBlock Margin="0,6,0,0">
-                                        <Hyperlink NavigateUri="{Binding DonateLink}" RequestNavigate="OnDonateLinkNavigate">
-                                            <Run Text="{Binding DonateLink}" />
-                                        </Hyperlink>
-                                    </TextBlock>
-                                    <Border Background="{DynamicResource AppBackground}"
-                                            BorderBrush="{DynamicResource AppCardBorder}"
-                                            BorderThickness="1"
-                                            CornerRadius="12"
-                                            Padding="12"
-                                            Margin="0,12,0,0"
-                                            HorizontalAlignment="Left">
-                                        <Image Source="pack://application:,,,/Assets/qr-tokyo.png"
-                                               Width="200"
-                                               Height="200"
-                                               Stretch="Uniform" />
-                                    </Border>
-                                </StackPanel>
-                            </Border>
-
-                            <TextBlock Text="{Binding DonateFooter}" Style="{StaticResource SectionSubtitleStyle}" />
-                            <TextBlock Text="{Binding AuthorName}" FontWeight="SemiBold" FontSize="14" />
-                        </StackPanel>
                     </Border>
 
                     <ContentPresenter x:Name="RootContentDialogPresenter"
