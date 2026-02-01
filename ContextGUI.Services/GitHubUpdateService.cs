@@ -55,6 +55,15 @@ public sealed class GitHubUpdateService : IUpdateService
             using var response = await _httpClient.GetAsync(url, cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
+                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    return new RegistryResult<UpdateInfo>
+                    {
+                        Success = false,
+                        Error = "GitHub API error: 404. Репозиторий приватный или релизы не опубликованы."
+                    };
+                }
+
                 return new RegistryResult<UpdateInfo>
                 {
                     Success = false,

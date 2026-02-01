@@ -129,6 +129,12 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private bool _showUpdateStatus;
 
+    [ObservableProperty]
+    private string _repositoryOwner = string.Empty;
+
+    [ObservableProperty]
+    private string _repositoryName = string.Empty;
+
     partial void OnBackupsChanged(ObservableCollection<BackupEntry> value)
     {
         RestoreLatestBackupCommand.NotifyCanExecuteChanged();
@@ -172,6 +178,18 @@ public partial class MainViewModel : ObservableObject
     partial void OnAutoCheckUpdatesChanged(bool value)
     {
         _settings.Update.AutoCheckUpdates = value;
+        _ = SaveSettingsAsync();
+    }
+
+    partial void OnRepositoryOwnerChanged(string value)
+    {
+        _settings.Update.RepositoryOwner = value?.Trim();
+        _ = SaveSettingsAsync();
+    }
+
+    partial void OnRepositoryNameChanged(string value)
+    {
+        _settings.Update.RepositoryName = value?.Trim();
         _ = SaveSettingsAsync();
     }
 
@@ -527,6 +545,8 @@ public partial class MainViewModel : ObservableObject
     {
         _settings = await _settingsService.LoadAsync();
         AutoCheckUpdates = _settings.Update.AutoCheckUpdates;
+        RepositoryOwner = _settings.Update.RepositoryOwner ?? string.Empty;
+        RepositoryName = _settings.Update.RepositoryName ?? string.Empty;
 
         if (string.IsNullOrWhiteSpace(_settings.Update.RepositoryOwner))
         {
@@ -537,6 +557,9 @@ public partial class MainViewModel : ObservableObject
         {
             _settings.Update.RepositoryName = "ContextGUI";
         }
+
+        RepositoryOwner = _settings.Update.RepositoryOwner;
+        RepositoryName = _settings.Update.RepositoryName;
 
         await SaveSettingsAsync();
     }

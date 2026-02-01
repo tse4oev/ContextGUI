@@ -264,6 +264,34 @@
                                 <CheckBox Content="Проверять автоматически"
                                           IsChecked="{Binding AutoCheckUpdates}"
                                           Foreground="{DynamicResource AppTextSecondary}" />
+                                <TextBlock Text="Репозиторий GitHub" Style="{StaticResource SectionSubtitleStyle}" Margin="0,10,0,4" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0"
+                                             Text="{Binding RepositoryOwner, UpdateSourceTrigger=PropertyChanged}"
+                                             Background="Transparent"
+                                             BorderThickness="1"
+                                             BorderBrush="{DynamicResource AppCardBorder}"
+                                             Foreground="{DynamicResource AppTextPrimary}"
+                                             Padding="8,6"
+                                             Margin="0,0,6,0" />
+                                    <TextBlock Grid.Column="1"
+                                               Text="/"
+                                               VerticalAlignment="Center"
+                                               Foreground="{DynamicResource AppTextSecondary}"
+                                               Margin="0,0,6,0" />
+                                    <TextBox Grid.Column="2"
+                                             Text="{Binding RepositoryName, UpdateSourceTrigger=PropertyChanged}"
+                                             Background="Transparent"
+                                             BorderThickness="1"
+                                             BorderBrush="{DynamicResource AppCardBorder}"
+                                             Foreground="{DynamicResource AppTextPrimary}"
+                                             Padding="8,6" />
+                                </Grid>
                                 <Button Style="{StaticResource ActionButtonStyle}"
                                         Content="Проверить обновления"
                                         Command="{Binding CheckUpdatesCommand}"
