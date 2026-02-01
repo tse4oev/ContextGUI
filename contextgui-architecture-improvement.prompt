@@ -1,0 +1,163 @@
+# Задача: Архитектурные улучшения ContextGUI
+
+## Общее описание
+ContextGUI - это приложение для управления контекстным меню Windows 11 через реестр. Приложение позволяет просматривать, включать, отключать, удалять и редактировать элементы контекстного меню. В текущей реализации есть несколько архитектурных проблем, которые необходимо решить для повышения тестируемости, расширяемости и поддерживаемости кода.
+
+Цель данного задания - улучшить архитектуру приложения, сделав её более соответствующей принципам SOLID, внедрению зависимостей и паттерну MVVM.
+
+## Технические требования
+- .NET 8
+- WPF
+- MVVM
+- Dependency Injection
+- Тестирование через xUnit
+
+## Улучшения архитектуры
+
+### 1. Создание абстракций для работы с операционной системой
+В текущей реализации класс OperatingSystemService напрямую зависит от статических методов .NET. Для улучшения тестируемости необходимо создать абстракцию IOperatingSystem, которая позволит заменить реальную реализацию на моки в тестах.
+
+Пример текущей реализации:
+```csharp
+public interface IOperatingSystem
+{
+    bool IsAdministrator { get; }
+    string GetFolderPath(Environment.SpecialFolder folder);
+}
+```
+
+Требуется:
+- Создать интерфейс IOperatingSystem с методами для работы с ОС
+- Реализовать реальный класс OperatingSystemService
+- Зарегистрировать сервис в DI контейнере
+- Заменить прямые зависимости на интерфейс
+
+### 2. Перенос бизнес-логики из ViewModel
+ViewModel содержит бизнес-логику, связанную с обработкой элементов контекстного меню, фильтрацией и управлением состоянием. Эту логику необходимо вынести в отдельные сервисы.
+
+Требуется:
+- Создать сервис IContextMenuManager для управления элементами контекстного меню
+- Создать сервис IFilterManager для управления фильтрацией
+- Перенести логику фильтрации из MainViewModel в IFilterManager
+- Перенести логику управления элементами в IContextMenuManager
+- Оставить во ViewModel только логику представления
+
+### 3. Централизованная валидация операций с реестром
+В текущей реализации валидация параметров разбросана по разным методам RegistryService. Необходимо создать централизованный механизм валидации.
+
+Требуется:
+- Создать интерфейс IRegistryValidator с методами валидации
+- Реализовать класс RegistryValidator с методами:
+  - ValidateKeyPath(string keyPath)
+  - ValidateEditParameters(string displayName, string command)
+  - ValidateAccessRights()
+- Интегрировать валидатор в RegistryService
+- Использовать валидатор во всех методах RegistryService
+
+### 4. Механизм отката изменений при ошибках
+В текущей реализации при ошибках операций с реестром создается резервная копия, но не происходит автоматического отката изменений. Необходимо реализовать механизм автоматического отката.
+
+Требуется:
+- Создать интерфейс ITransactionManager для управления транзакциями
+- Реализовать механизм отката изменений при ошибках
+- Интегрировать механизм в RegistryService
+- Обеспечить автоматический откат при возникновении исключений
+
+## Структура файлов
+```
+ContextGUI/
+├── ContextGUI/                         # Основное WPF приложение
+│   ├── App.xaml.cs                     # Точка входа и DI контейнер
+│   ├── Views/                          # Представления
+│   │   └── MainWindow.xaml/.cs
+│   └── Dialogs/                        # Диалоговые окна
+├── ContextGUI.Core/                    # Ядро приложения
+│   ├── ViewModels/                     # ViewModel слой
+│   │   └── MainViewModel.cs
+│   └── Services/                       # Сервисы приложения
+├── ContextGUI.Models/                  # Модели данных
+│   ├── ContextMenuItem.cs
+│   ├── RegistryResult.cs
+│   └── Enums/
+├── ContextGUI.Services/                # Бизнес-логика и инфраструктура
+│   ├── Interfaces/                     # Интерфейсы сервисов
+│   ├── Registry/                       # Работа с реестром
+│   ├── Validation/                      # Валидация
+│   ├── Transactions/                   # Управление транзакциями
+│   └── Managers/                      # Менеджеры бизнес-логики
+└── ContextGUI.Tests/                  # Тесты
+    ├── Services/
+    ├── ViewModels/
+    └── Managers/
+```
+
+## Требования к реализации
+
+### Требования к интерфейсу IOperatingSystem
+```csharp
+public interface IOperatingSystem
+{
+    bool IsAdministrator { get; }
+    string GetFolderPath(Environment.SpecialFolder folder);
+    string GetEnvironmentVariable(string variable);
+    bool FileExists(string path);
+    bool DirectoryExists(string path);
+}
+```
+
+### Требования к IContextMenuManager
+```csharp
+public interface IContextMenuManager
+{
+    Task<IReadOnlyList<ContextMenuItem>> GetAllItemsAsync(CancellationToken cancellationToken = default);
+    Task<RegistryResult<bool>> DisableItemAsync(string keyPath, CancellationToken cancellationToken = default);
+    Task<RegistryResult<bool>> EnableItemAsync(string keyPath, CancellationToken cancellationToken = default);
+    Task<RegistryResult<bool>> DeleteItemAsync(string keyPath, CancellationToken cancellationToken = default);
+    Task<RegistryResult<bool>> UpdateItemAsync(string keyPath, string displayName, string? iconPath, string? command, CancellationToken cancellationToken = default);
+}
+```
+
+### Требования к IFilterManager
+```csharp
+public interface IFilterManager
+{
+    IEnumerable<ContextMenuItem> ApplyFilters(IEnumerable<ContextMenuItem> items, FilterCriteria criteria);
+    bool MatchesSearch(ContextMenuItem item, string query);
+    bool MatchesEnabledFilter(ContextMenuItem item, bool showOnlyEnabled);
+    bool MatchesCategory(ContextMenuItem item, ContextMenuCategory category);
+}
+```
+
+### Требования к IRegistryValidator
+```csharp
+public interface IRegistryValidator
+{
+    ValidationResult ValidateKeyPath(string keyPath);
+    ValidationResult ValidateEditParameters(string displayName, string command);
+    ValidationResult ValidateAccessRights();
+}
+```
+
+### Требования к ITransactionManager
+```csharp
+public interface ITransactionManager
+{
+    Task<string> CreateBackupAsync(string keyPath, CancellationToken cancellationToken = default);
+    Task<RegistryResult<bool>> RestoreFromBackupAsync(string backupPath, CancellationToken cancellationToken = default);
+    Task<RegistryResult<bool>> ExecuteWithRollbackAsync(Func<Task<RegistryResult<bool>>> operation, string keyPath, CancellationToken cancellationToken = default);
+}
+```
+
+### Требования к DI контейнеру
+Все новые сервисы должны быть зарегистрированы в DI контейнере:
+- IOperatingSystem → OperatingSystemService
+- IContextMenuManager → ContextMenuManager
+- IFilterManager → FilterManager
+- IRegistryValidator → RegistryValidator
+- ITransactionManager → TransactionManager
+
+### Требования к тестированию
+Для каждого нового интерфейса необходимо создать тесты:
+- Модульные тесты для каждого сервиса
+- Тесты с использованием моков для зависимостей
+- Тесты граничных условий и ошибок

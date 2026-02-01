@@ -1,0 +1,50 @@
+# Registry Operations Rules
+
+## Критические правила безопасности
+
+### 1. Всегда проверяй права администратора
+Перед любой операцией с реестром:
+```csharp
+if (!IsAdministrator())
+    return Result.Failure("Требуются права администратора");
+```
+
+### 2. Всегда создавай backup
+Перед изменением реестра:
+```csharp
+var backupPath = await _backupService.CreateBackupAsync(keyPath);
+```
+
+### 3. Используй using для RegistryKey
+```csharp
+using var key = Registry.ClassesRoot.OpenSubKey(path, writable: true);
+```
+
+### 4. Обрабатывай исключения
+- SecurityException
+- UnauthorizedAccessException
+- IOException
+
+### 5. Логируй все операции
+```csharp
+_logger.LogInformation("Operation: {Operation}, Path: {Path}", operation, path);
+```
+
+## Критические ключи реестра (НЕ ТРОГАТЬ)
+
+- `HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon`
+- `HKLM\SYSTEM\CurrentControlSet\Control`
+- Системные CLSID
+
+## Result Pattern
+
+Всегда возвращай Result<T>:
+```csharp
+public class RegistryResult<T>
+{
+    public bool Success { get; init; }
+    public T? Value { get; init; }
+    public string? Error { get; init; }
+    public string? BackupPath { get; init; }
+}
+```
