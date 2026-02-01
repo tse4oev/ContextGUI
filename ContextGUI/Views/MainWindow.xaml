@@ -28,10 +28,18 @@
 
                 <ui:TitleBar Grid.Row="0" Title="" Foreground="{DynamicResource AppTextPrimary}">
                     <ui:TitleBar.Header>
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
-                            <Ellipse Width="8" Height="8" Fill="{DynamicResource AppAccent}" Margin="0,0,10,0" />
-                            <TextBlock Text="ContextGUI" FontWeight="SemiBold" FontSize="13" />
-                        </StackPanel>
+                        <Grid Margin="8,0,0,0">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
+                                        Visibility="{Binding IsMainPage, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <Ellipse Width="8" Height="8" Fill="{DynamicResource AppAccent}" Margin="0,0,10,0" />
+                                <TextBlock Text="ContextGUI" FontWeight="SemiBold" FontSize="13" />
+                            </StackPanel>
+                            <StackPanel VerticalAlignment="Center"
+                                        Visibility="{Binding IsDonatePage, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <TextBlock Text="Поддержать автора" FontWeight="SemiBold" FontSize="14" />
+                                <TextBlock Text="Спасибо за поддержку проекта" Style="{StaticResource SectionSubtitleStyle}" />
+                            </StackPanel>
+                        </Grid>
                     </ui:TitleBar.Header>
                 </ui:TitleBar>
 
@@ -154,7 +162,8 @@
 
                     <Border Grid.Column="2" Style="{StaticResource CardContainerStyle}"
                             Visibility="{Binding IsMainPage, Converter={StaticResource BooleanToVisibilityConverter}}">
-                        <StackPanel>
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel>
                             <TextBlock Text="Детали" Style="{StaticResource SectionTitleStyle}" />
                             <TextBlock Text="Выберите элемент для просмотра деталей" Style="{StaticResource SectionSubtitleStyle}" TextWrapping="Wrap" />
 
@@ -309,7 +318,8 @@
                                     <TextBlock Text="{Binding UpdateStatusMessage}" Style="{StaticResource SectionSubtitleStyle}" TextWrapping="Wrap" />
                                 </Border>
                             </StackPanel>
-                        </StackPanel>
+                            </StackPanel>
+                        </ScrollViewer>
                     </Border>
                     <Border Grid.Column="1" Grid.ColumnSpan="2" Style="{StaticResource CardContainerStyle}"
                             Visibility="{Binding IsDonatePage, Converter={StaticResource BooleanToVisibilityConverter}}">

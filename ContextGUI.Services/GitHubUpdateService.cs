@@ -60,7 +60,7 @@ public sealed class GitHubUpdateService : IUpdateService
                     return new RegistryResult<UpdateInfo>
                     {
                         Success = false,
-                        Error = "GitHub API error: 404. Репозиторий приватный или релизы не опубликованы."
+                        Error = $"GitHub API error: 404. Проверьте репозиторий {settings.RepositoryOwner}/{settings.RepositoryName}, наличие релизов и версию тега."
                     };
                 }
 
