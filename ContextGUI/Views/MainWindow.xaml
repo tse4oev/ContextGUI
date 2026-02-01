@@ -4,16 +4,19 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     Title="ContextGUI"
-    Height="720"
-    Width="1260"
-    MinHeight="640"
-    MinWidth="980"
+    Height="680"
+    Width="1120"
+    MinHeight="680"
+    MinWidth="1120"
+    MaxHeight="680"
+    MaxWidth="1120"
     WindowStartupLocation="CenterScreen"
     ExtendsContentIntoTitleBar="True"
     WindowBackdropType="Mica"
     Background="Transparent"
     Foreground="{DynamicResource AppTextPrimary}"
-    FontFamily="{DynamicResource AppFont}">
+    FontFamily="{DynamicResource AppFont}"
+    ResizeMode="NoResize">
 
     <Grid>
         <Border Background="{DynamicResource AppBackgroundGradient}">
